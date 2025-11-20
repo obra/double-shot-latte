@@ -9,5 +9,5 @@
   "homepage": "https://github.com/anthropics/claude-code",
   "license": "MIT",
   "keywords": ["hooks", "automation", "workflow", "continuation"],
-  "hooks": "${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json"
+  "hooks": "./hooks/hooks.json"
 }

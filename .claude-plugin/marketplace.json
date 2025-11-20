@@ -1,0 +1,18 @@
+{
+  "name": "auto-continue-dev",
+  "description": "Development marketplace for auto-continue plugin",
+  "owner": {
+    "name": "Jesse"
+  },
+  "plugins": [
+    {
+      "name": "auto-continue",
+      "description": "Automatically evaluates whether Claude should continue working instead of stopping prematurely using Claude-judged decision making",
+      "version": "1.0.0",
+      "source": "./",
+      "author": {
+        "name": "Jesse"
+      }
+    }
+  ]
+}

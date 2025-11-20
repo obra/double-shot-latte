@@ -1,0 +1,13 @@
+{
+  "name": "auto-continue",
+  "version": "1.0.0",
+  "description": "Automatically evaluates whether Claude should continue working instead of stopping prematurely using Claude-judged decision making",
+  "author": {
+    "name": "Jesse",
+    "url": "https://github.com/anthropics"
+  },
+  "homepage": "https://github.com/anthropics/claude-code",
+  "license": "MIT",
+  "keywords": ["hooks", "automation", "workflow", "continuation"],
+  "hooks": "${CLAUDE_PLUGIN_ROOT}/hooks/hooks.json"
+}

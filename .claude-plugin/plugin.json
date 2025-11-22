@@ -1,6 +1,6 @@
 {
   "name": "double-shot-latte",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Automatically evaluates whether Claude should continue working instead of stopping prematurely using Claude-judged decision making",
   "author": {
     "name": "Jesse",

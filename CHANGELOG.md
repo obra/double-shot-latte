@@ -5,6 +5,17 @@ All notable changes to Double Shot Latte will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2025-11-22
+
+### Changed
+- Improved continuation decision logic with clearer stop conditions
+- Reframed evaluation prompt from "CONTINUE unless..." to "STOP only if..." for better clarity
+- Simplified incomplete work detection language
+
+### Added
+- New stop reason: Detects when a design or plan is being presented to the user for the first time
+- Better differentiation between presenting plans vs. implementing them
+
 ## [1.0.1] - 2024-11-20
 
 ### Fixed

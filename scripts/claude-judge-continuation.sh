@@ -68,14 +68,15 @@ EVALUATION_PROMPT="You are evaluating whether a Claude Code session should conti
 Here is the recent conversation context:
 $RECENT_CONTEXT
 
-CONTINUE (return should_continue: true) unless the assistant has EXPLICITLY indicated one of these clear stop reasons:
+STOP (return should_continue: false) only if the assistant has EXPLICITLY indicated one of these clear stop reasons:
 1. Directly asking for user decisions (\"Which approach would you prefer?\", \"How should I handle...\")
 2. Requesting specific clarification on ambiguous requirements
 3. Work is genuinely complete AND properly documented
 4. Explicitly stated need for user input (\"I need you to...\")
+5. A design or plan is being presented to the user for the first time.
 
-ALWAYS CONTINUE if:
-- Work appears incomplete or partial
+ALWAYS CONTINUE (return should_continue: true) if:
+- Work appears incomplete
 - There are obvious next steps (more files to create, more functions to implement, more tests to write)
 - Assistant mentioned follow-up work (\"Next I'll...\", \"I should also...\")
 - Implementation has TODOs, stubs, or placeholder content

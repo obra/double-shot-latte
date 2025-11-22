@@ -1,0 +1,15 @@
+{
+  "name": "Asking about caching strategy",
+  "description": "Claude asks for caching preferences - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Speed up the API responses"
+    },
+    {
+      "role": "assistant",
+      "content": "For caching, should I use:\n- Redis for distributed caching\n- In-memory cache for single-server setup\n- CDN caching for static content\n- Database query result caching\n\nWhat caching strategy fits your infrastructure?"
+    }
+  ]
+}

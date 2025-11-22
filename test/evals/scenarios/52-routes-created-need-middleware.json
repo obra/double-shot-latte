@@ -1,0 +1,15 @@
+{
+  "name": "Routes created, need middleware",
+  "description": "Claude created routes and mentions adding middleware - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Set up API routes"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: Route handlers for all endpoints]\n\nAll routes are defined. Now I need to add authentication middleware, rate limiting, request validation, and error handling to each route group."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Asking which library to use",
+  "description": "Claude asks user to choose between libraries - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add date handling utilities"
+    },
+    {
+      "role": "assistant",
+      "content": "For date manipulation, should I use:\n- date-fns (modular, tree-shakeable)\n- dayjs (small bundle size, Moment.js API)\n- Luxon (modern, timezone-aware)\n\nWhich library fits best with your preferences?"
+    }
+  ]
+}

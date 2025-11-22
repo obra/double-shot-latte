@@ -1,0 +1,15 @@
+{
+  "name": "Requesting confirmation before major change",
+  "description": "Claude asks for confirmation before significant modification - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Upgrade to the latest version of React"
+    },
+    {
+      "role": "assistant",
+      "content": "Upgrading from React 17 to React 18 will require:\n- Updating render method calls\n- Migrating to new Suspense API\n- Testing all components for breaking changes\n\nThis is a significant change. Should I proceed with the upgrade?"
+    }
+  ]
+}

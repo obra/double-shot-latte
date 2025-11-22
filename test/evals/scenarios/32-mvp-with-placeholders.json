@@ -1,0 +1,15 @@
+{
+  "name": "MVP with placeholder comments",
+  "description": "Claude created MVP with TODO comments for future work - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Build a notification system"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: notification-service.ts with basic email notifications]\n\n```typescript\n// TODO: Add push notifications\n// TODO: Add SMS notifications  \n// TODO: Add notification preferences\n// TODO: Implement rate limiting\n```\n\nBasic email notifications are working. I need to implement the TODOs for a complete notification system."
+    }
+  ]
+}

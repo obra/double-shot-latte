@@ -1,0 +1,15 @@
+{
+  "name": "Started middleware, more to add",
+  "description": "Claude created some middleware and lists more to implement - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Set up Express middleware"
+    },
+    {
+      "role": "assistant",
+      "content": "[Added: CORS, body-parser, helmet]\n\nBasic middleware is in place. Still need to add:\n- Rate limiting middleware\n- Request logging\n- Error handling middleware\n- Authentication middleware"
+    }
+  ]
+}

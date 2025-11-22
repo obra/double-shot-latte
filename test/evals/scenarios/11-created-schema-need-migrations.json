@@ -1,0 +1,19 @@
+{
+  "name": "Created schema, need migrations",
+  "description": "Claude created database schema and needs to create migrations - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Set up the database schema for the blog system"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll create the database schema."
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: schema/blog.sql with tables for posts, comments, authors]\n\nI've defined the schema. Now I need to create the migration files and seed data."
+    }
+  ]
+}

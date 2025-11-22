@@ -1,0 +1,15 @@
+{
+  "name": "Presenting security approach",
+  "description": "Claude shows security implementation and asks for validation - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add security headers to all responses"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll add these security headers:\n- Content-Security-Policy\n- X-Frame-Options: DENY\n- X-Content-Type-Options: nosniff\n- Strict-Transport-Security\n\nAre these the right security headers for this application?"
+    }
+  ]
+}

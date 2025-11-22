@@ -1,0 +1,15 @@
+{
+  "name": "Presenting design options for selection",
+  "description": "Claude presents multiple design options and asks user to choose - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Redesign the database schema for better performance"
+    },
+    {
+      "role": "assistant",
+      "content": "I've analyzed the current schema. Here are three options for optimization:\n\nOption A: Denormalize user data (faster reads, more storage)\nOption B: Add materialized views (complex maintenance, good performance)  \nOption C: Implement read replicas (infrastructure cost, excellent scaling)\n\nWhich option would you like to go with?"
+    }
+  ]
+}

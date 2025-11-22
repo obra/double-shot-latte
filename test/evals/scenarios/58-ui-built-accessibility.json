@@ -1,0 +1,15 @@
+{
+  "name": "UI built, adding accessibility",
+  "description": "Claude built UI and mentions accessibility improvements - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Create the dashboard UI"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: Dashboard with charts, widgets, and navigation]\n\nDashboard UI is functional. Now I need to add accessibility features: ARIA labels, keyboard navigation, screen reader support, and color contrast improvements."
+    }
+  ]
+}

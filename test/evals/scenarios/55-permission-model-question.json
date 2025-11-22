@@ -1,0 +1,15 @@
+{
+  "name": "Asking about permission model",
+  "description": "Claude asks for authorization requirements - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Implement role-based access control"
+    },
+    {
+      "role": "assistant",
+      "content": "For permissions, should I use:\n- Simple role-based (Admin, User, Guest)\n- Role with permissions (Admin has all, User has subset)\n- Attribute-based access control (ABAC)\n- Resource-level permissions\n\nWhat level of granularity do you need?"
+    }
+  ]
+}

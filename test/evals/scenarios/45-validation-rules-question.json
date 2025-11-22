@@ -1,0 +1,15 @@
+{
+  "name": "Asking about validation rules",
+  "description": "Claude asks for validation requirements - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add form validation"
+    },
+    {
+      "role": "assistant",
+      "content": "For the registration form, what validation rules should I enforce:\n- Password minimum length?\n- Password complexity requirements?\n- Email domain restrictions?\n- Username character restrictions?\n\nWhat are the validation requirements?"
+    }
+  ]
+}

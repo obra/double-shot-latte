@@ -1,0 +1,15 @@
+{
+  "name": "Wrote migrations, need testing",
+  "description": "Claude created migrations and mentions testing is next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Create database migration files"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: 3 migration files for users, posts, and comments tables]\n\nMigrations are written. Now I need to test them on a fresh database, verify rollback works, and add seed data for development."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "API partially implemented",
+  "description": "Claude implemented some endpoints and lists remaining ones - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Build the REST API for the blogging platform"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: POST /posts, GET /posts/:id]\n\nCreated the create and read endpoints. Still need to implement:\n- PUT /posts/:id (update)\n- DELETE /posts/:id (delete)\n- GET /posts (list with filtering)\n- POST /posts/:id/publish"
+    }
+  ]
+}

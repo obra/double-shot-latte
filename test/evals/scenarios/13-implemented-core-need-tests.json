@@ -1,0 +1,15 @@
+{
+  "name": "Implemented core logic, need tests",
+  "description": "Claude implemented core functionality and mentions tests are next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Create a payment processing module"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: src/payments/processor.ts with charge, refund, and validate methods]\n\nI've implemented the core payment processing logic. Next I need to add comprehensive tests for each payment method and edge cases."
+    }
+  ]
+}

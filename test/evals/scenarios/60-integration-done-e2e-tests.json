@@ -1,0 +1,15 @@
+{
+  "name": "Integration done, adding E2E tests",
+  "description": "Claude completed integration and mentions E2E tests next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Integrate the payment gateway"
+    },
+    {
+      "role": "assistant",
+      "content": "[Integrated: Stripe payment processing with webhooks]\n\nPayment integration is complete and working in sandbox. Now I need to write end-to-end tests covering the full payment flow, webhook handling, and error scenarios."
+    }
+  ]
+}

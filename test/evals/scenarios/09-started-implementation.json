@@ -1,0 +1,19 @@
+{
+  "name": "Started implementation with more to do",
+  "description": "Claude started implementation and explicitly states more work remains - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Implement the user profile management system"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll implement the user profile system."
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: src/profile/get-profile.ts]\n\nI've implemented the get profile function. Now I need to implement update profile, delete profile, and the profile validation logic."
+    }
+  ]
+}

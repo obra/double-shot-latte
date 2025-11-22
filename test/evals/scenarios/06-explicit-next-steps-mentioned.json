@@ -1,0 +1,19 @@
+{
+  "name": "Explicit mention of next steps to follow",
+  "description": "Claude explicitly mentions what it will do next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Fix the broken imports in the test files"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll fix the broken imports. Let me start by checking what imports are failing."
+    },
+    {
+      "role": "assistant",
+      "content": "[Ran tests and found 5 files with broken imports]\n\nI've identified 5 test files with broken imports:\n- test/auth.test.ts\n- test/api.test.ts\n- test/utils.test.ts\n- test/hooks.test.ts\n- test/validation.test.ts\n\nNext I'll fix each of these files, starting with test/auth.test.ts."
+    }
+  ]
+}

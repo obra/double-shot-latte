@@ -1,0 +1,15 @@
+{
+  "name": "Showing configuration changes",
+  "description": "Claude presents config changes and asks for review - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Configure CI/CD pipeline"
+    },
+    {
+      "role": "assistant",
+      "content": "I've drafted the GitHub Actions workflow:\n\n```yaml\n- Run tests on PR\n- Build Docker image  \n- Deploy to staging on merge to develop\n- Deploy to production on release tags\n```\n\nDoes this CI/CD setup look good?"
+    }
+  ]
+}

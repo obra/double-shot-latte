@@ -1,0 +1,15 @@
+{
+  "name": "Tests are failing, need fixes",
+  "description": "Claude mentions tests are failing and need to be fixed - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Run the test suite"
+    },
+    {
+      "role": "assistant",
+      "content": "[Ran tests: 45 passing, 12 failing]\n\nI found 12 failing tests across the auth and payment modules. Let me fix these test failures one by one."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "name": "Mid-implementation with TODOs and placeholders",
+  "description": "Claude is in the middle of implementing with stub code and TODOs - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Implement a webhook handler for GitHub events"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll implement the GitHub webhook handler."
+    },
+    {
+      "role": "assistant",
+      "content": "[Created file: src/webhooks/github.ts]\n\nI've set up the basic webhook handler structure:\n\n```typescript\nexport async function handleGithubWebhook(payload: any) {\n  // TODO: Add signature verification\n  // TODO: Add event type routing\n  // TODO: Add error handling\n  \n  const eventType = payload.event;\n  return { status: 'received' };\n}\n```\n\nNow I need to implement the signature verification, event routing, and proper error handling."
+    }
+  ]
+}

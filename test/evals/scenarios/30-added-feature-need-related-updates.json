@@ -1,0 +1,15 @@
+{
+  "name": "Added feature, need related code updates",
+  "description": "Claude added new feature and mentions related updates needed - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add multi-language support"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: i18n system with English and Spanish]\n\nMulti-language support is in place. Now I need to update all existing UI components to use the translation keys and add language switching UI."
+    }
+  ]
+}

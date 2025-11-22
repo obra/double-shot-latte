@@ -1,0 +1,15 @@
+{
+  "name": "Fixed one bug, more on the list",
+  "description": "Claude fixed one bug and lists more to fix - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Fix the failing tests in the auth module"
+    },
+    {
+      "role": "assistant",
+      "content": "[Fixed: test/auth/login.test.ts - corrected mock setup]\n\nFixed the login test. Still need to fix:\n- register.test.ts (3 failing)\n- logout.test.ts (1 failing)\n- token-refresh.test.ts (2 failing)"
+    }
+  ]
+}

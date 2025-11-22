@@ -1,0 +1,15 @@
+{
+  "name": "Implemented feature, need documentation",
+  "description": "Claude finished feature and mentions documentation is next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add OAuth2 authentication"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: OAuth2 flow with Google, GitHub, and Facebook providers]\n\nOAuth2 authentication is working. Now I need to add documentation for setup, configuration, and integration guides."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Partial implementation with more features",
+  "description": "Claude partially implemented and lists remaining features - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Build a file upload system"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: Basic file upload to local storage]\n\nFile upload is working locally. Still need to:\n- Add cloud storage integration (S3)\n- Implement file validation and virus scanning\n- Add progress tracking\n- Create thumbnail generation for images"
+    }
+  ]
+}

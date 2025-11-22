@@ -1,0 +1,19 @@
+{
+  "name": "Work incomplete with obvious next steps",
+  "description": "Claude has created one file but there are more files to create - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Create a user authentication system with login, logout, and registration"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll create the authentication system. Let me start by creating the login handler."
+    },
+    {
+      "role": "assistant",
+      "content": "[Created file: src/auth/login.ts with login implementation]\n\nI've created the login handler. Next I need to create the logout handler and registration handler."
+    }
+  ]
+}

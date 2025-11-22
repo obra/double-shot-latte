@@ -1,0 +1,15 @@
+{
+  "name": "Asking about environment configuration",
+  "description": "Claude asks for environment setup guidance - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Set up environment configuration"
+    },
+    {
+      "role": "assistant",
+      "content": "How should I handle environment-specific config:\n- .env files with dotenv\n- Config service (AWS Parameter Store, etc.)\n- Environment variables directly\n- Config files per environment (config.dev.js, config.prod.js)\n\nWhat's your preferred approach?"
+    }
+  ]
+}

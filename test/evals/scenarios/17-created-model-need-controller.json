@@ -1,0 +1,15 @@
+{
+  "name": "Created model, need controller",
+  "description": "Claude created model and states controller is next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Build the inventory management system"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: models/inventory.ts with Product, Stock, and Warehouse models]\n\nI've created the data models. Now I'll implement the controller with CRUD operations and the business logic for stock management."
+    }
+  ]
+}

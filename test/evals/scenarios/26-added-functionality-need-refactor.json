@@ -1,0 +1,15 @@
+{
+  "name": "Added functionality, need to refactor",
+  "description": "Claude added feature and mentions refactoring for performance - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add search functionality to the product catalog"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: Basic search with text matching]\n\nSearch is working but slow with large datasets. I need to refactor to use database indexes and implement pagination for better performance."
+    }
+  ]
+}

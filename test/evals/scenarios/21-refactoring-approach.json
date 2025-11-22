@@ -1,0 +1,15 @@
+{
+  "name": "Presenting refactoring approach",
+  "description": "Claude proposes refactoring and asks for approval - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "The UserService class has gotten too large"
+    },
+    {
+      "role": "assistant",
+      "content": "I propose splitting UserService into:\n- UserAuthService (login, logout, tokens)\n- UserProfileService (profile updates, preferences)\n- UserManagementService (admin operations)\n\nShould I proceed with this refactoring?"
+    }
+  ]
+}

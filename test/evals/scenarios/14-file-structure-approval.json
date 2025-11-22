@@ -1,0 +1,15 @@
+{
+  "name": "Showing proposed file structure",
+  "description": "Claude presents file structure and asks if it looks good - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Organize the codebase into a better structure"
+    },
+    {
+      "role": "assistant",
+      "content": "I propose this new structure:\n\n```\nsrc/\n  core/\n    auth/\n    db/\n  features/\n    users/\n    posts/\n  shared/\n    utils/\n    types/\n```\n\nDoes this structure look good to you?"
+    }
+  ]
+}

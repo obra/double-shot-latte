@@ -1,0 +1,15 @@
+{
+  "name": "Asking about state management approach",
+  "description": "Claude requests guidance on state management - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "The app needs better state management"
+    },
+    {
+      "role": "assistant",
+      "content": "For state management, should I implement:\n- Redux (established, verbose)\n- Zustand (simple, minimal boilerplate)\n- Jotai (atomic state)\n- Context API (built-in, lightweight)\n\nWhat would work best for this app's complexity?"
+    }
+  ]
+}

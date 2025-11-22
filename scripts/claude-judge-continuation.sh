@@ -68,14 +68,22 @@ EVALUATION_PROMPT="You are evaluating whether a Claude Code session should conti
 Here is the recent conversation context:
 $RECENT_CONTEXT
 
-STOP (return should_continue: false) only if the assistant has EXPLICITLY indicated one of these clear stop reasons:
-1. Directly asking for user decisions (\"Which approach would you prefer?\", \"How should I handle...\")
-2. Requesting specific clarification on ambiguous requirements
-3. Work is genuinely complete AND properly documented
-4. Explicitly stated need for user input (\"I need you to...\")
-5. A design or plan is being presented to the user for the first time.
+CRITICAL: Stop conditions ALWAYS take precedence over continue conditions.
 
-ALWAYS CONTINUE (return should_continue: true) if:
+STOP (return should_continue: false) if ANY of these apply:
+1. Presenting a plan/design and asking for approval or feedback (\"Does this approach look good?\", \"Should I proceed?\", \"Does this wording work?\")
+2. Directly asking for user decisions (\"Which approach would you prefer?\", \"How should I handle...\")
+3. Requesting specific clarification on ambiguous requirements
+4. Work is genuinely complete AND properly documented
+5. Explicitly stated need for user input (\"I need you to...\")
+
+Plan presentation signals (these REQUIRE stopping):
+- Presenting design sections with questions like \"Does this look right?\", \"Should I continue?\"
+- Outlining proposed changes and asking \"Does this approach work for you?\"
+- Showing specific text/code changes before implementing and asking for confirmation
+- ANY question asking for approval/feedback on what WILL be done (not what WAS done)
+
+CONTINUE (return should_continue: true) ONLY if ALL stop conditions are absent AND:
 - Work appears incomplete
 - There are obvious next steps (more files to create, more functions to implement, more tests to write)
 - Assistant mentioned follow-up work (\"Next I'll...\", \"I should also...\")
@@ -83,9 +91,7 @@ ALWAYS CONTINUE (return should_continue: true) if:
 - Multi-step process with remaining steps
 - Assistant is in the middle of a logical sequence
 
-The test: If a user could reasonably type 'continue' and Claude would know what to do next, return should_continue: true.
-
-Return should_continue: false ONLY for clear, explicit stop signals requiring user input."
+Remember: If BOTH stop and continue conditions apply, STOP wins. Plan presentation + incomplete work = STOP."
 
 # Use claude --print to get the evaluation with structured output
 # Set environment variable to prevent recursion and use JSON schema for reliable parsing

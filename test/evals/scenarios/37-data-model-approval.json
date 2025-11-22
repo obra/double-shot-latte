@@ -1,0 +1,15 @@
+{
+  "name": "Showing data model for approval",
+  "description": "Claude presents data model design and asks if it works - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Design the data model for the blog system"
+    },
+    {
+      "role": "assistant",
+      "content": "Here's the proposed data model:\n\nPost (id, title, content, authorId, publishedAt, status)\nComment (id, postId, userId, content, createdAt)\nTag (id, name)\nPostTag (postId, tagId)\n\nDoes this structure capture all the requirements?"
+    }
+  ]
+}

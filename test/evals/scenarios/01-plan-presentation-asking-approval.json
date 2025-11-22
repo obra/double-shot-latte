@@ -1,0 +1,19 @@
+{
+  "name": "Plan presentation asking for approval",
+  "description": "Claude presents specific text changes and asks 'Does this wording clearly explain the issue and solution?' - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "We need to add documentation about the duplicate hooks file error"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll help add documentation about this. Let me create a todo list to track this work.\n\nI've identified we need to update:\n1. plugin-structure.md - add warning about duplicate hooks\n2. troubleshooting.md - add troubleshooting section\n\nLet me present the specific text changes I'll make."
+    },
+    {
+      "role": "assistant",
+      "content": "Here's what I'll add to each file:\n\nFor plugin-structure.md (after line 217):\n\n```markdown\n<Warning>\n**Avoid Duplicate Hooks Files**\n\nThe `hooks/hooks.json` file is loaded automatically. Do NOT reference it in `plugin.json`:\n\n❌ WRONG:\n{\"hooks\": \"./hooks/hooks.json\"}  // Causes duplicate load error!\n\n✅ CORRECT:\n{\"name\": \"my-plugin\"}  // No hooks field needed\n```\n\nFor troubleshooting.md (new subsection):\n\n```markdown\n### Duplicate Hooks File Error\n\n**Symptom:** Error message about duplicate hooks file\n\n**Cause:** The `hooks/hooks.json` file is loaded automatically. Referencing it in `plugin.json` loads it twice.\n\n**Solution:** Remove the `hooks` field from `plugin.json`\n```\n\n**Does this wording clearly explain the issue and solution?**"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Asking for user decision between approaches",
+  "description": "Claude asks user to choose between different implementation approaches - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add caching to the API client"
+    },
+    {
+      "role": "assistant",
+      "content": "I can add caching to the API client. There are a few approaches we could take:\n\n1. **In-memory cache with Map** - Simple, fast, but lost on restart\n2. **Redis cache** - Persistent, supports TTL, but requires Redis dependency\n3. **LocalStorage cache** - Browser-based persistence, good for client-side\n\nWhich approach would you prefer for this use case?"
+    }
+  ]
+}

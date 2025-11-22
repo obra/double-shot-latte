@@ -1,0 +1,15 @@
+{
+  "name": "Presenting API design for review",
+  "description": "Claude shows API design and asks for feedback - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Design the REST API for the task management feature"
+    },
+    {
+      "role": "assistant",
+      "content": "Here's the proposed API design:\n\n- POST /tasks - Create task\n- GET /tasks/:id - Get task\n- PUT /tasks/:id - Update task  \n- DELETE /tasks/:id - Delete task\n- GET /tasks?status=active - List tasks\n\nDoes this API design work for your needs?"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Asking 'should I proceed' with approach",
+  "description": "Claude describes an approach and asks if they should proceed - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add error handling to the API endpoints"
+    },
+    {
+      "role": "assistant",
+      "content": "I can add error handling. I'm thinking of creating a centralized error handler middleware that catches all errors and formats them consistently. Should I proceed with this approach?"
+    }
+  ]
+}

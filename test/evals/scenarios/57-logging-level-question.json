@@ -1,0 +1,15 @@
+{
+  "name": "Asking about logging configuration",
+  "description": "Claude asks for logging preferences - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add application logging"
+    },
+    {
+      "role": "assistant",
+      "content": "For logging configuration:\n- What log levels should be enabled in production? (debug, info, warn, error)\n- Should logs go to files, console, or external service (DataDog, Splunk)?\n- What information should be included in logs?\n\nWhat are your logging requirements?"
+    }
+  ]
+}

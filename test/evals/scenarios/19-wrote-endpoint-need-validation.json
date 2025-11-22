@@ -1,0 +1,15 @@
+{
+  "name": "Wrote endpoint, need validation",
+  "description": "Claude created endpoint and mentions validation is next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add the user registration endpoint"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: routes/auth/register.ts with basic handler]\n\nI've created the registration endpoint. Now I need to add input validation, password strength checks, and email verification logic."
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "name": "Asking about rate limit configuration",
+  "description": "Claude asks for rate limiting parameters - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add rate limiting to the API"
+    },
+    {
+      "role": "assistant",
+      "content": "What rate limits should I enforce:\n- Requests per minute per IP?\n- Different limits for authenticated vs anonymous users?\n- Endpoint-specific limits (stricter on auth endpoints)?\n\nWhat rate limiting policy do you want?"
+    }
+  ]
+}

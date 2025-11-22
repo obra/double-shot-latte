@@ -1,0 +1,15 @@
+{
+  "name": "Asking about backup strategy",
+  "description": "Claude asks for backup preferences - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Set up database backups"
+    },
+    {
+      "role": "assistant",
+      "content": "For database backups, should I:\n- Daily full backups with 30-day retention\n- Hourly incremental + daily full\n- Continuous point-in-time recovery\n- What's your backup and retention policy?"
+    }
+  ]
+}

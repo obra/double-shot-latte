@@ -1,0 +1,15 @@
+{
+  "name": "Showing test plan for approval",
+  "description": "Claude presents test plan and asks if it looks right - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Write tests for the authentication system"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll create tests covering:\n1. Successful login with valid credentials\n2. Failed login with invalid password\n3. Account lockout after failed attempts\n4. Token expiration and refresh\n5. Session management\n\nDoes this test coverage look comprehensive?"
+    }
+  ]
+}

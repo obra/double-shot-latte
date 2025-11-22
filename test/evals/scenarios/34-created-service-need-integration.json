@@ -1,0 +1,15 @@
+{
+  "name": "Created service, need integration",
+  "description": "Claude created new service and mentions integration is next - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add analytics tracking"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: analytics-service.ts with event tracking and user identification]\n\nThe analytics service is ready. Now I need to integrate it into all the key user flows and add event tracking to buttons, forms, and navigation."
+    }
+  ]
+}

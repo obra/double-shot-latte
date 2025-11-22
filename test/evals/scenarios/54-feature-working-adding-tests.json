@@ -1,0 +1,15 @@
+{
+  "name": "Feature working, adding tests",
+  "description": "Claude got feature working and explicitly mentions adding tests - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add export functionality"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: Data export to CSV, JSON, and XML formats]\n\nExport functionality is working correctly. I'll now write tests for each export format, edge cases like empty data, and large datasets."
+    }
+  ]
+}

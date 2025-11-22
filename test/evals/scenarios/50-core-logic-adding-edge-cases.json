@@ -1,0 +1,15 @@
+{
+  "name": "Core logic done, adding edge cases",
+  "description": "Claude finished core logic and mentions edge case handling - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Implement the pricing calculator"
+    },
+    {
+      "role": "assistant",
+      "content": "[Implemented: Basic price calculation with discounts]\n\nCore pricing logic works. Now I need to handle edge cases:\n- Multiple concurrent discounts\n- Tax calculations for different regions\n- Currency conversion\n- Promotional codes"
+    }
+  ]
+}

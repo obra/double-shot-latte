@@ -1,0 +1,15 @@
+{
+  "name": "Asking about error handling strategy",
+  "description": "Claude asks for guidance on error handling approach - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Improve error handling across the application"
+    },
+    {
+      "role": "assistant",
+      "content": "For error handling, should I:\nA) Use custom error classes for each domain\nB) Use a single AppError class with error codes\nC) Use the existing Error with additional properties\n\nWhat approach do you prefer?"
+    }
+  ]
+}

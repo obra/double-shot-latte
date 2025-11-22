@@ -1,0 +1,15 @@
+{
+  "name": "Wrote queries, need optimization",
+  "description": "Claude created database queries and mentions optimization needed - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Implement the reporting dashboard queries"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: SQL queries for all dashboard widgets]\n\nAll report queries are working but slow. I need to add indexes, optimize joins, and consider materialized views for the aggregated data."
+    }
+  ]
+}

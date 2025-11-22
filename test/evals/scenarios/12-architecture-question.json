@@ -1,0 +1,15 @@
+{
+  "name": "Asking about architectural decision",
+  "description": "Claude asks for architectural guidance - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Implement real-time notifications"
+    },
+    {
+      "role": "assistant",
+      "content": "For real-time notifications, should I use WebSockets or Server-Sent Events? WebSockets are bidirectional but more complex, SSE is simpler but one-way. What fits better with your architecture?"
+    }
+  ]
+}

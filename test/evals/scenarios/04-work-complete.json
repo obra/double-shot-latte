@@ -1,0 +1,19 @@
+{
+  "name": "Work genuinely complete and documented",
+  "description": "Claude has completed all requested work and documented it - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add a helper function to format dates"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll add a date formatting helper function."
+    },
+    {
+      "role": "assistant",
+      "content": "[Created file: src/utils/dateFormatter.ts]\n\nI've created the `formatDate` helper function in `src/utils/dateFormatter.ts`. It supports multiple formats (ISO, US, EU) and handles invalid dates gracefully. I've also added:\n\n- JSDoc documentation\n- Unit tests with 100% coverage\n- Export from the main utils index\n\nThe function is ready to use."
+    }
+  ]
+}

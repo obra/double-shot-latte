@@ -1,0 +1,15 @@
+{
+  "name": "Asking about naming conventions",
+  "description": "Claude asks for naming preference - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Create service classes for business logic"
+    },
+    {
+      "role": "assistant",
+      "content": "Should I name the services as UserService, PostService, etc., or use the pattern UserManager, PostManager? What's your preference for this codebase?"
+    }
+  ]
+}

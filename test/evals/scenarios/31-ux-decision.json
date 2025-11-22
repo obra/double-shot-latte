@@ -1,0 +1,15 @@
+{
+  "name": "Requesting UX feedback",
+  "description": "Claude asks for UX decision - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Improve the onboarding flow"
+    },
+    {
+      "role": "assistant",
+      "content": "For the onboarding, should it be:\nA) Single page with progressive disclosure\nB) Multi-step wizard  \nC) Guided tour overlay\n\nWhat UX pattern do you prefer for new users?"
+    }
+  ]
+}

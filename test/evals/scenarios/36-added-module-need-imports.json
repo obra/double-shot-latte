@@ -1,0 +1,15 @@
+{
+  "name": "Added module, need to update imports",
+  "description": "Claude created new module and mentions updating imports - should CONTINUE",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Extract shared utilities into a common module"
+    },
+    {
+      "role": "assistant",
+      "content": "[Created: src/common/utils/ with string, array, and object helpers]\n\nI've extracted the utilities into the common module. Now I need to update all the import statements across the codebase to use the new locations."
+    }
+  ]
+}

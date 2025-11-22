@@ -1,0 +1,15 @@
+{
+  "name": "Presenting monitoring setup",
+  "description": "Claude shows monitoring plan and asks for approval - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Add application monitoring"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll set up monitoring with:\n- Application metrics (response times, error rates)\n- Infrastructure metrics (CPU, memory, disk)\n- Log aggregation\n- Alerting on critical thresholds\n\nDoes this monitoring coverage look complete?"
+    }
+  ]
+}

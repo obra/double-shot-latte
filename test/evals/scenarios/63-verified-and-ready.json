@@ -1,0 +1,19 @@
+{
+  "name": "Verified installation ready to use",
+  "description": "Claude verified the setup and confirms tools are available - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Install sosumi MCP globally"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll install the sosumi MCP server globally."
+    },
+    {
+      "role": "assistant",
+      "content": "Verified - sosumi is connected and ready. After restart you'll have searchAppleDocumentation and fetchAppleDocumentation tools available in any project."
+    }
+  ]
+}

@@ -5,6 +5,21 @@ All notable changes to Double Shot Latte will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.4] - 2025-11-25
+
+### Fixed
+- Task completion statements now correctly trigger STOP instead of CONTINUE
+- Reframed evaluator from "question detection" to "work state detection"
+- Offering optional actions (e.g., "Want me to run X?") now correctly triggers STOP
+
+### Changed
+- Evaluator now uses --system-prompt to establish classifier identity (not a coding agent)
+- Disabled all tools for evaluator instance with --disallowedTools
+- Simplified prompt to use pattern descriptions instead of exact quote matching
+
+### Added
+- 5 new test scenarios for task completion edge cases (61-65)
+
 ## [1.1.3] - 2025-11-24
 
 ### Fixed

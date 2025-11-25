@@ -1,0 +1,19 @@
+{
+  "name": "Task complete with availability statement",
+  "description": "Claude confirms task is done and feature is available - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Set up sosumi MCP server"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll configure the sosumi MCP server for you."
+    },
+    {
+      "role": "assistant",
+      "content": "Done. Sosumi is now available globally across all projects."
+    }
+  ]
+}

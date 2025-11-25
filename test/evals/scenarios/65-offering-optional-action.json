@@ -1,0 +1,19 @@
+{
+  "name": "Offering optional follow-up action",
+  "description": "Claude completed work and offers to do something additional - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Fix the failing test scenarios"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll fix the evaluator prompt to handle task completion scenarios correctly."
+    },
+    {
+      "role": "assistant",
+      "content": "Done. Here's the fix:\n\n| Scenario | Expected | Result |\n|----------|----------|--------|\n| 61: MCP install | STOP | Pass |\n| 62: Task complete | STOP | Pass |\n\nWant me to run the full eval suite to confirm no regressions?"
+    }
+  ]
+}

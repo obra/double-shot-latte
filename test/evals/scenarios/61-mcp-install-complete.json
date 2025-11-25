@@ -1,0 +1,19 @@
+{
+  "name": "MCP server installation complete",
+  "description": "Claude completed installing an MCP server and confirmed it's working - should STOP",
+  "expected_decision": false,
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Install sosumi globally"
+    },
+    {
+      "role": "assistant",
+      "content": "I'll move the sosumi MCP configuration from local to user scope so it's available globally."
+    },
+    {
+      "role": "assistant",
+      "content": "Done - moved from local to user scope so it's available globally."
+    }
+  ]
+}

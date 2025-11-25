@@ -62,37 +62,43 @@ RECENT_CONTEXT=$(tail -n 10 "$TRANSCRIPT_PATH" | jq -s '.')
 # Create a JSON schema for the response
 JSON_SCHEMA='{"type":"object","properties":{"should_continue":{"type":"boolean"},"reasoning":{"type":"string"}},"required":["should_continue","reasoning"]}'
 
-# Create a prompt for Claude to evaluate whether continuation is appropriate
-EVALUATION_PROMPT="You are evaluating whether a Claude Code session should continue working.
+# System prompt to establish evaluator identity (not a coding agent)
+SYSTEM_PROMPT="You are a conversation state classifier. Your only job is to analyze conversation transcripts and determine if the assistant has more autonomous work to do. You output structured JSON. You do not write code or use tools."
 
-Here is the recent conversation context:
+# Create the evaluation prompt
+EVALUATION_PROMPT="Analyze this conversation and determine: Does the assistant have more autonomous work to do RIGHT NOW?
+
+Conversation:
 $RECENT_CONTEXT
 
-THE RULE IS SIMPLE:
+CONTINUE (should_continue: true) ONLY IF the assistant explicitly states what it will do next:
+- Phrases indicating intent to continue (e.g., 'Next I need to...', 'Now I'll...', 'Moving on to...')
+- Incomplete todo list with remaining items marked pending
+- Stated follow-up tasks not yet performed
 
-STOP (return should_continue: false) if the assistant's message ends with ANY question directed at the user.
+STOP (should_continue: false) in ALL other cases:
 
-This includes but is not limited to:
-- Asking for approval (\"Does this look good?\", \"Should I proceed?\")
-- Asking for decisions (\"Which approach?\", \"What direction?\")
-- Asking for clarification (\"What do you mean by...?\")
-- Asking for confirmation (\"Is this what you wanted?\")
-- Asking for input (\"What should I name this?\")
+1. TASK COMPLETION - The assistant indicates work is finished:
+   - Completion statements (done, complete, finished, ready, all set)
+   - Summary of accomplished work with no stated next steps
+   - Confirming something is working/verified/installed
 
-THE ONLY EXCEPTION - CONTINUE (return should_continue: true) if:
-The assistant is asking whether to continue working on the current task. Examples:
-- \"Should I continue?\" (in the context of continuing implementation)
-- \"Want me to keep going?\"
-- \"Should I proceed with the next step?\"
-- \"Shall I continue with the remaining items?\"
+2. QUESTIONS - The assistant needs user input:
+   - Asking for approval, decisions, clarification, or confirmation
+   - Offering optional actions (e.g., 'Want me to...?', 'Should I also...?')
+   - Note: Mid-task continuation questions (e.g., 'Should I continue?' when work is ongoing) = CONTINUE
 
-These \"should I continue working\" questions get an implicit YES - continue working.
+3. BLOCKERS - The assistant cannot proceed:
+   - Unresolved errors or missing information
+   - Uncertainty about requirements
 
-ANY OTHER QUESTION = STOP. No exceptions. Context doesn't matter (brainstorming, bug fixing, implementing - irrelevant). If it's a question and it's not \"should I keep working?\", STOP."
+KEY: If the assistant is WAITING for the user (whether after completing work OR asking a question), that means STOP. Waiting ≠ more autonomous work to do.
+
+Default to STOP when uncertain."
 
 # Use claude --print to get the evaluation with structured output
-# Set environment variable to prevent recursion and use JSON schema for reliable parsing
-CLAUDE_RESPONSE=$(echo "$EVALUATION_PROMPT" | CLAUDE_HOOK_JUDGE_MODE=true claude --print --model haiku --output-format json --json-schema "$JSON_SCHEMA" 2>/dev/null)
+# Set environment variable to prevent recursion, use JSON schema, disable tools
+CLAUDE_RESPONSE=$(echo "$EVALUATION_PROMPT" | CLAUDE_HOOK_JUDGE_MODE=true claude --print --model haiku --output-format json --json-schema "$JSON_SCHEMA" --system-prompt "$SYSTEM_PROMPT" --disallowedTools '*' 2>/dev/null)
 
 # Check if claude command succeeded
 if [ $? -ne 0 ]; then

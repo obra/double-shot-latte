@@ -106,8 +106,8 @@ if [ $? -ne 0 ]; then
     exit 0
 fi
 
-# Extract the structured output from the claude response (stream JSON format)
-EVALUATION_RESULT=$(echo "$CLAUDE_RESPONSE" | jq '.[] | select(.type == "result") | .structured_output // empty' 2>/dev/null)
+# Extract the structured output from the claude response (JSON format)
+EVALUATION_RESULT=$(echo "$CLAUDE_RESPONSE" | jq '.structured_output // empty' 2>/dev/null)
 
 # If no structured output, fall back to allowing stop
 if [ -z "$EVALUATION_RESULT" ] || [ "$EVALUATION_RESULT" = "null" ]; then

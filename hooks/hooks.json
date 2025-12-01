@@ -5,7 +5,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PLUGIN_ROOT}/scripts/claude-judge-continuation.sh"
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/scripts/claude-judge-continuation.js\""
           }
         ]
       }

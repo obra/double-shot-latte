@@ -5,7 +5,7 @@
 set -e
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-HOOK_SCRIPT="$SCRIPT_DIR/../scripts/claude-judge-continuation.sh"
+HOOK_SCRIPT="$SCRIPT_DIR/../hooks/claude-judge-continuation.sh"
 TEST_DIR="$HOME/.claude/double-shot-latte"
 
 # Colors for output

@@ -103,7 +103,9 @@ Default to STOP when uncertain."
 # Use claude --print to get the evaluation with structured output
 # Set environment variable to prevent recursion, use JSON schema, disable tools
 # Run claude in the dedicated working directory
-CLAUDE_RESPONSE=$(echo "$EVALUATION_PROMPT" | (cd "$CLAUDE_WORK_DIR" && CLAUDE_HOOK_JUDGE_MODE=true claude --print --model haiku --output-format json --json-schema "$JSON_SCHEMA" --system-prompt "$SYSTEM_PROMPT" --disallowedTools '*') 2>/dev/null)
+# Model can be configured via DOUBLE_SHOT_LATTE_MODEL env var (default: haiku)
+JUDGE_MODEL="${DOUBLE_SHOT_LATTE_MODEL:-haiku}"
+CLAUDE_RESPONSE=$(echo "$EVALUATION_PROMPT" | (cd "$CLAUDE_WORK_DIR" && CLAUDE_HOOK_JUDGE_MODE=true claude --print --model "$JUDGE_MODEL" --output-format json --json-schema "$JSON_SCHEMA" --system-prompt "$SYSTEM_PROMPT" --disallowedTools '*') 2>/dev/null)
 
 # Check if claude command succeeded
 if [ $? -ne 0 ]; then

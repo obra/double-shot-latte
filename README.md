@@ -82,9 +82,31 @@ When Claude tries to stop, a separate Claude instance evaluates the context and 
 - **Graceful fallback** - allows stopping if evaluation fails
 - **Zero configuration** - works after installation
 
+## Configuration
+
+### Model Selection
+
+By default, the plugin uses Claude Haiku for fast, cost-effective judgments. You can configure a different model via environment variable:
+
+**Configuration** (`~/.claude/settings.json`):
+```json
+{
+  "env": {
+    "DOUBLE_SHOT_LATTE_MODEL": "sonnet"
+  }
+}
+```
+
+**Available models:**
+- `haiku` (default) - Fast and cost-effective
+- `sonnet` - More capable reasoning
+- `opus` - Highest capability
+
+**Note:** The judge model runs on every stop attempt. Using more expensive models will increase costs proportionally.
+
 ## Technical Details
 
-- **Model:** Claude Haiku (fast, cost-effective)
+- **Default Model:** Claude Haiku (fast, cost-effective)
 - **Context:** Last 10 transcript entries
 - **Throttling:** 3 continuations per 5-minute window
 - **Performance:** Minimal latency on stop decisions only

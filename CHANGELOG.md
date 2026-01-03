@@ -5,6 +5,25 @@ All notable changes to Double Shot Latte will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-02
+
+### Fixed
+- **Critical**: Added 30-second timeout to Claude CLI subprocess to prevent indefinite hangs
+  - Processes no longer accumulate when Claude CLI becomes unresponsive
+  - Graceful fallback to STOP decision on timeout (exit code 124)
+- **Critical**: Added signal handlers (trap) to clean up child processes on exit
+  - Prevents orphaned zombie processes when hook is terminated
+  - Handles EXIT, TERM, INT, and HUP signals
+- Improved error reporting by capturing stderr instead of silencing it
+  - Enables debugging of Claude CLI failures
+  - Exit codes are now included in error messages
+- Throttle file now uses atomic writes to prevent race conditions
+  - Uses temp file + mv pattern for safe concurrent access
+
+### Changed
+- Removed unnecessary subshell around Claude CLI invocation
+- Simplified command structure for better timeout handling
+
 ## [1.1.5] - 2025-12-03
 
 ### Fixed

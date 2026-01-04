@@ -122,7 +122,7 @@ CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
     --output-format json \
     --json-schema "$JSON_SCHEMA" \
     --system-prompt "$SYSTEM_PROMPT" \
-    --disallowedTools '*' 2>&1)
+    --disallowedTools '*')
 CLAUDE_EXIT_CODE=$?
 
 # Check if claude command succeeded (exit 124 = timeout)

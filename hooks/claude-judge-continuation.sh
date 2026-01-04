@@ -7,8 +7,11 @@
 
 # Cleanup handler to prevent orphaned child processes
 cleanup() {
-    # Kill any background jobs we spawned
-    jobs -p 2>/dev/null | xargs -r kill 2>/dev/null
+    # Kill any background jobs we spawned (portable, no GNU xargs dependency)
+    pids=$(jobs -p 2>/dev/null)
+    if [ -n "$pids" ]; then
+        kill $pids 2>/dev/null
+    fi
 }
 trap cleanup EXIT TERM INT HUP
 

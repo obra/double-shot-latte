@@ -159,9 +159,20 @@ if [ "$SHOULD_CONTINUE" = "true" ]; then
         CONTINUE_COUNT=1
     fi
     # Atomic write to prevent race conditions with concurrent hook invocations
-    TEMP_THROTTLE=$(mktemp)
-    echo "$CONTINUE_COUNT:$CURRENT_TIME" > "$TEMP_THROTTLE"
-    mv "$TEMP_THROTTLE" "$THROTTLE_FILE"
+    TEMP_THROTTLE="$(mktemp)" || TEMP_THROTTLE=""
+    if [ -z "$TEMP_THROTTLE" ] || [ ! -f "$TEMP_THROTTLE" ]; then
+        echo "Warning: failed to create temporary throttle file; skipping throttle update" >&2
+    else
+        if echo "$CONTINUE_COUNT:$CURRENT_TIME" > "$TEMP_THROTTLE"; then
+            if ! mv "$TEMP_THROTTLE" "$THROTTLE_FILE"; then
+                echo "Warning: failed to move temporary throttle file into place; throttle update not persisted" >&2
+                rm -f "$TEMP_THROTTLE"
+            fi
+        else
+            echo "Warning: failed to write to temporary throttle file; skipping throttle update" >&2
+            rm -f "$TEMP_THROTTLE"
+        fi
+    fi
 
     # Block the stop - Claude thinks it can continue
     jq -n --arg reason "Claude evaluator determined continuation is appropriate: $REASONING" '{

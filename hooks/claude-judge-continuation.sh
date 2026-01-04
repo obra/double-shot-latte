@@ -5,6 +5,16 @@
 # Uses another Claude instance to judge whether continuation is appropriate
 # DEFAULT STANCE: Continue unless there's a CLEAR reason to stop
 
+# Cleanup handler to prevent orphaned child processes
+cleanup() {
+    # Kill any background jobs we spawned (portable, no GNU xargs dependency)
+    pids=$(jobs -p 2>/dev/null)
+    if [ -n "$pids" ]; then
+        kill $pids 2>/dev/null
+    fi
+}
+trap cleanup EXIT TERM INT HUP
+
 # Check if we're in a recursive call (judge Claude instance)
 if [ "$CLAUDE_HOOK_JUDGE_MODE" = "true" ]; then
     echo '{"decision": "approve", "reason": "Running in judge mode, allowing stop"}'
@@ -104,12 +114,24 @@ Default to STOP when uncertain."
 # Set environment variable to prevent recursion, use JSON schema, disable tools
 # Run claude in the dedicated working directory
 # Model can be configured via DOUBLE_SHOT_LATTE_MODEL env var (default: haiku)
+# Timeout after 30 seconds to prevent indefinite hangs
 JUDGE_MODEL="${DOUBLE_SHOT_LATTE_MODEL:-haiku}"
-CLAUDE_RESPONSE=$(echo "$EVALUATION_PROMPT" | (cd "$CLAUDE_WORK_DIR" && CLAUDE_HOOK_JUDGE_MODE=true claude --print --model "$JUDGE_MODEL" --output-format json --json-schema "$JSON_SCHEMA" --system-prompt "$SYSTEM_PROMPT" --disallowedTools '*') 2>/dev/null)
+CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
+    CLAUDE_HOOK_JUDGE_MODE=true timeout 30 claude --print \
+    --model "$JUDGE_MODEL" \
+    --output-format json \
+    --json-schema "$JSON_SCHEMA" \
+    --system-prompt "$SYSTEM_PROMPT" \
+    --disallowedTools '*')
+CLAUDE_EXIT_CODE=$?
 
-# Check if claude command succeeded
-if [ $? -ne 0 ]; then
-    echo '{"decision": "approve", "reason": "Claude evaluation command failed, allowing default stop behavior"}'
+# Check if claude command succeeded (exit 124 = timeout)
+if [ $CLAUDE_EXIT_CODE -ne 0 ]; then
+    if [ $CLAUDE_EXIT_CODE -eq 124 ]; then
+        echo '{"decision": "approve", "reason": "Claude evaluation timed out after 30 seconds, allowing default stop behavior"}'
+    else
+        echo '{"decision": "approve", "reason": "Claude evaluation command failed (exit '$CLAUDE_EXIT_CODE'), allowing default stop behavior"}'
+    fi
     exit 0
 fi
 
@@ -136,7 +158,21 @@ if [ "$SHOULD_CONTINUE" = "true" ]; then
     else
         CONTINUE_COUNT=1
     fi
-    echo "$CONTINUE_COUNT:$CURRENT_TIME" > "$THROTTLE_FILE"
+    # Atomic write to prevent race conditions with concurrent hook invocations
+    TEMP_THROTTLE="$(mktemp)" || TEMP_THROTTLE=""
+    if [ -z "$TEMP_THROTTLE" ] || [ ! -f "$TEMP_THROTTLE" ]; then
+        echo "Warning: failed to create temporary throttle file; skipping throttle update" >&2
+    else
+        if echo "$CONTINUE_COUNT:$CURRENT_TIME" > "$TEMP_THROTTLE"; then
+            if ! mv "$TEMP_THROTTLE" "$THROTTLE_FILE"; then
+                echo "Warning: failed to move temporary throttle file into place; throttle update not persisted" >&2
+                rm -f "$TEMP_THROTTLE"
+            fi
+        else
+            echo "Warning: failed to write to temporary throttle file; skipping throttle update" >&2
+            rm -f "$TEMP_THROTTLE"
+        fi
+    fi
 
     # Block the stop - Claude thinks it can continue
     jq -n --arg reason "Claude evaluator determined continuation is appropriate: $REASONING" '{

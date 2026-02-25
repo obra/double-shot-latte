@@ -5,6 +5,15 @@
 # Uses another Claude instance to judge whether continuation is appropriate
 # DEFAULT STANCE: Continue unless there's a CLEAR reason to stop
 
+# Clean up any background jobs on exit to avoid orphaned claude processes
+cleanup() {
+    pids=$(jobs -p 2>/dev/null)
+    if [ -n "$pids" ]; then
+        kill $pids 2>/dev/null
+    fi
+}
+trap cleanup EXIT TERM INT HUP
+
 # Check if we're in a recursive call (judge Claude instance)
 if [ "$CLAUDE_HOOK_JUDGE_MODE" = "true" ]; then
     echo '{"decision": "approve", "reason": "Running in judge mode, allowing stop"}'
@@ -55,9 +64,11 @@ if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
     exit 0
 fi
 
-# Extract the last few exchanges from the transcript (Claude's response + context)
-# We want the most recent assistant message and some preceding context
-RECENT_CONTEXT=$(tail -n 10 "$TRANSCRIPT_PATH" | jq -s '.')
+# Extract the last few exchanges from the transcript.
+# JSONL files have one JSON object per line; lines from parallel agents can be
+# megabytes each. Take the last 4 lines then cap total size so the judge model
+# gets classification-level context, not a firehose.
+RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
 
 # Create a JSON schema for the response
 JSON_SCHEMA='{"type":"object","properties":{"should_continue":{"type":"boolean"},"reasoning":{"type":"string"}},"required":["should_continue","reasoning"]}'
@@ -104,12 +115,25 @@ Default to STOP when uncertain."
 # Set environment variable to prevent recursion, use JSON schema, disable tools
 # Run claude in the dedicated working directory
 # Model can be configured via DOUBLE_SHOT_LATTE_MODEL env var (default: haiku)
+# Timeout can be configured via DOUBLE_SHOT_LATTE_TIMEOUT env var (default: 30s)
 JUDGE_MODEL="${DOUBLE_SHOT_LATTE_MODEL:-haiku}"
-CLAUDE_RESPONSE=$(echo "$EVALUATION_PROMPT" | (cd "$CLAUDE_WORK_DIR" && CLAUDE_HOOK_JUDGE_MODE=true claude --print --model "$JUDGE_MODEL" --output-format json --json-schema "$JSON_SCHEMA" --system-prompt "$SYSTEM_PROMPT" --disallowedTools '*') 2>/dev/null)
+JUDGE_TIMEOUT="${DOUBLE_SHOT_LATTE_TIMEOUT:-30}"
+CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
+    CLAUDE_HOOK_JUDGE_MODE=true timeout "$JUDGE_TIMEOUT" claude --print \
+    --model "$JUDGE_MODEL" \
+    --output-format json \
+    --json-schema "$JSON_SCHEMA" \
+    --system-prompt "$SYSTEM_PROMPT" \
+    --disallowedTools '*' 2>/dev/null)
+CLAUDE_EXIT_CODE=$?
 
-# Check if claude command succeeded
-if [ $? -ne 0 ]; then
-    echo '{"decision": "approve", "reason": "Claude evaluation command failed, allowing default stop behavior"}'
+# Check if claude command succeeded (exit 124 = timeout)
+if [ $CLAUDE_EXIT_CODE -ne 0 ]; then
+    if [ $CLAUDE_EXIT_CODE -eq 124 ]; then
+        echo '{"decision": "approve", "reason": "Claude evaluation timed out, allowing default stop behavior"}'
+    else
+        echo '{"decision": "approve", "reason": "Claude evaluation command failed, allowing default stop behavior"}'
+    fi
     exit 0
 fi
 

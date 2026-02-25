@@ -5,6 +5,20 @@ All notable changes to Double Shot Latte will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-02-25
+
+### Fixed
+- **macOS/Linux**: Escaped quotes in `hooks.json` produced malformed shell syntax causing "operation was aborted". Removed quotes entirely.
+- **Windows**: Script was named `claude-judge-continuation.sh` — Claude Code on Windows auto-prepends `bash` to any hook command containing `.sh`, defeating the CMD polyglot dispatch. Renamed to `claude-judge-continuation` (no extension).
+- **Windows**: `run-hook.cmd` only tried one hardcoded bash path (`C:\Program Files\Git\bin\bash.exe`). Now tries Program Files (x86) and `bash` on PATH as fallbacks, covering MSYS2, Cygwin, and non-standard Git installations.
+- **Unix**: `run-hook.cmd` Unix section called the script directly (requiring execute-bit). Now uses `exec bash` so no `chmod` is needed on the hook script.
+- **All platforms**: Added 30-second timeout on `claude --print` subprocess (configurable via `DOUBLE_SHOT_LATTE_TIMEOUT`). On timeout, defaults to approve rather than hanging indefinitely.
+- **Large conversations**: `tail -n 10` on JSONL files sent megabytes of parallel-agent output to the judge model. Now capped at 4 lines / 32KB — sufficient for classification.
+
+### Added
+- Cleanup trap (`EXIT TERM INT HUP`) kills any orphaned child processes when the hook exits.
+- `DOUBLE_SHOT_LATTE_TIMEOUT` env var to configure judge subprocess timeout (default: 30s).
+
 ## [1.1.5] - 2025-12-03
 
 ### Fixed

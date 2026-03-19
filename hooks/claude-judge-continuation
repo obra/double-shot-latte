@@ -118,8 +118,27 @@ Default to STOP when uncertain."
 # Timeout can be configured via DOUBLE_SHOT_LATTE_TIMEOUT env var (default: 30s)
 JUDGE_MODEL="${DOUBLE_SHOT_LATTE_MODEL:-haiku}"
 JUDGE_TIMEOUT="${DOUBLE_SHOT_LATTE_TIMEOUT:-30}"
+
+# Resolve a cross-platform timeout command.
+# GNU coreutils `timeout` is not available on macOS; try `gtimeout` (Homebrew
+# coreutils) first, then fall back to a POSIX-portable perl alarm wrapper that
+# ships with every macOS and most Linux distros.
+if command -v timeout >/dev/null 2>&1; then
+    TIMEOUT_CMD="timeout"
+elif command -v gtimeout >/dev/null 2>&1; then
+    TIMEOUT_CMD="gtimeout"
+else
+    # Portable fallback: perl alarm(). Sends SIGALRM after $1 seconds, which
+    # terminates the child and yields exit code 142 (128+14). We remap that to
+    # 124 below so the existing timeout-handling logic still works.
+    _portable_timeout() {
+        perl -e 'alarm shift; exec @ARGV' "$@"
+    }
+    TIMEOUT_CMD="_portable_timeout"
+fi
+
 CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
-    CLAUDE_HOOK_JUDGE_MODE=true timeout "$JUDGE_TIMEOUT" claude --print \
+    CLAUDE_HOOK_JUDGE_MODE=true $TIMEOUT_CMD "$JUDGE_TIMEOUT" claude --print \
     --model "$JUDGE_MODEL" \
     --output-format json \
     --json-schema "$JSON_SCHEMA" \
@@ -127,9 +146,10 @@ CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
     --disallowedTools '*' 2>/dev/null)
 CLAUDE_EXIT_CODE=$?
 
-# Check if claude command succeeded (exit 124 = timeout)
+# Check if claude command succeeded
+# Exit 124 = GNU timeout expired, 142 = perl alarm (128 + SIGALRM 14)
 if [ $CLAUDE_EXIT_CODE -ne 0 ]; then
-    if [ $CLAUDE_EXIT_CODE -eq 124 ]; then
+    if [ $CLAUDE_EXIT_CODE -eq 124 ] || [ $CLAUDE_EXIT_CODE -eq 142 ]; then
         echo '{"decision": "approve", "reason": "Claude evaluation timed out, allowing default stop behavior"}'
     else
         echo '{"decision": "approve", "reason": "Claude evaluation command failed, allowing default stop behavior"}'

@@ -4,9 +4,9 @@
   "description": "Automatically evaluates whether Claude should continue working instead of stopping prematurely using Claude-judged decision making",
   "author": {
     "name": "Jesse",
-    "url": "https://github.com/anthropics"
+    "url": "https://github.com/obra"
   },
-  "homepage": "https://github.com/anthropics/claude-code",
+  "homepage": "https://github.com/obra/double-shot-latte",
   "license": "MIT",
   "keywords": ["hooks", "automation", "workflow", "continuation"]
 }

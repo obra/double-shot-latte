@@ -104,6 +104,25 @@ By default, the plugin uses Claude Haiku for fast, cost-effective judgments. You
 
 **Note:** The judge model runs on every stop attempt. Using more expensive models will increase costs proportionally.
 
+### Skipping Evaluation
+
+The plugin attempts to auto-detect print-and-exit (`claude -p`) mode via process tree inspection and skips evaluation. If auto-detection fails in your environment (containers, unusual process namespaces), set `DOUBLE_SHOT_LATTE_SKIP=true` to unconditionally skip the continuation judge. Useful in CI pipelines or scripted `claude -p` usage:
+
+**Configuration** (`~/.claude/settings.json`):
+```json
+{
+  "env": {
+    "DOUBLE_SHOT_LATTE_SKIP": "true"
+  }
+}
+```
+
+Or as a one-off override:
+
+```bash
+DOUBLE_SHOT_LATTE_SKIP=true claude -p "your prompt"
+```
+
 ## Technical Details
 
 - **Default Model:** Claude Haiku (fast, cost-effective)

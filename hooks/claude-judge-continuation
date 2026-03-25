@@ -20,6 +20,30 @@ if [ "$CLAUDE_HOOK_JUDGE_MODE" = "true" ]; then
     exit 0
 fi
 
+if [ "$DOUBLE_SHOT_LATTE_SKIP" = "true" ]; then
+    echo '{"decision": "approve", "reason": "Skipped via DOUBLE_SHOT_LATTE_SKIP"}'
+    exit 0
+fi
+
+# Skip evaluation when running inside a print-and-exit session
+_is_ancestor_print_mode() {
+    local pid=$PPID
+    while [ "$pid" -gt 1 ] 2>/dev/null; do
+        local cmd
+        cmd=$(ps -o args= -p "$pid" 2>/dev/null) || break
+        if echo "$cmd" | grep -qE '(^|/)claude[[:space:]].*(--print|-p([[:space:]]|$))'; then
+            return 0
+        fi
+        pid=$(ps -o ppid= -p "$pid" 2>/dev/null | tr -d ' ') || break
+    done
+    return 1
+}
+
+if _is_ancestor_print_mode; then
+    echo '{"decision": "approve", "reason": "Print-and-exit mode detected in ancestor process"}'
+    exit 0
+fi
+
 # Read the hook event data
 EVENT=$(cat)
 

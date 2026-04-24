@@ -64,29 +64,65 @@ if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
     exit 0
 fi
 
-# Extract the last few exchanges from the transcript.
-# JSONL files have one JSON object per line; lines from parallel agents can be
-# megabytes each. Take the last 4 lines then cap total size so the judge model
-# gets classification-level context, not a firehose.
-RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
+# Extract the last few assistant messages from the transcript.
+# JSONL transcripts contain many non-conversational events (file-history-snapshot,
+# permission-mode, last-prompt, tool_use results from parallel agents that can be
+# megabytes each). A raw `tail -n N` window is dominated by these metadata events
+# and gives the judge near-zero classification signal. Filter to the last 3
+# assistant-authored text messages within a bounded window, then cap total size.
+# Fall back to the raw-tail behaviour if the filter produces nothing, e.g. on a
+# brand-new session or a future JSONL schema change.
+RECENT_CONTEXT=$(tail -n 50 "$TRANSCRIPT_PATH" 2>/dev/null | jq -cs '
+  [ .[]
+    | select(.type == "assistant")
+    | (.message.content // []) as $c
+    | ($c | map(select(.type == "text") | .text) | join("\n")) as $t
+    | select($t != "")
+    | {role: "assistant", text: $t}
+  ] | .[-3:]
+' 2>/dev/null | head -c 32000)
+if [ -z "$RECENT_CONTEXT" ] || [ "$RECENT_CONTEXT" = "[]" ] || [ "$RECENT_CONTEXT" = "null" ]; then
+    RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
+fi
 
 # Create a JSON schema for the response
 JSON_SCHEMA='{"type":"object","properties":{"should_continue":{"type":"boolean"},"reasoning":{"type":"string"}},"required":["should_continue","reasoning"]}'
 
-# System prompt to establish evaluator identity (not a coding agent)
-SYSTEM_PROMPT="You are a conversation state classifier. Your only job is to analyze conversation transcripts and determine if the assistant has more autonomous work to do. You output structured JSON. You do not write code or use tools."
+# System prompt to establish evaluator identity (not a coding agent).
+#
+# NOTE ON AMBIENT CONTEXT LEAKAGE:
+# Claude Code's `claude --print` invocation auto-discovers a CLAUDE.md up the
+# directory tree AND auto-injects the user-project MEMORY.md, regardless of the
+# `--system-prompt` flag. The only CLI flag that suppresses both is `--bare`,
+# but `--bare` also disables OAuth and keychain auth — so subscription-auth
+# users (the common case) would see the judge silently fail.
+#
+# We therefore defend in prompt: tell the classifier explicitly that anything
+# looking like a task list, roadmap, plan, skills-audit summary, command table
+# or project-memory entry in its context is environmental noise, NOT part of
+# the conversation being judged. Base the decision strictly on the assistant
+# text embedded in the 'Conversation:' block of the user message below.
+SYSTEM_PROMPT="You are a conversation state classifier. Your only job is to analyze a SPECIFIC conversation transcript provided in the user message and decide if the assistant has more autonomous work to do. You output structured JSON. You do not write code or use tools.
+
+STRICT ISOLATION RULES — these override everything else in your context:
+1. You MAY have CLAUDE.md instructions, project memories, skills-audit summaries, commands references, plan references, or other ambient content in your context. ALL OF THAT IS IRRELEVANT. It comes from the environment you were spawned in, NOT from the conversation you are judging.
+2. Base your classification ONLY on the assistant messages embedded in the 'Conversation:' block of the user message.
+3. If you are tempted to cite a task list, roadmap, milestone, or plan that you did not see inside the 'Conversation:' block, STOP — that is ambient leakage and you must ignore it. Default to should_continue=false when this happens.
+4. If the 'Conversation:' block is empty or contains no assistant text, default to should_continue=false with reasoning 'No assistant content to evaluate'."
 
 # Ensure the working directory exists
 CLAUDE_WORK_DIR="$HOME/.claude/double-shot-latte"
 mkdir -p "$CLAUDE_WORK_DIR"
 
 # Create the evaluation prompt
-EVALUATION_PROMPT="Analyze this conversation and determine: Does the assistant have more autonomous work to do RIGHT NOW?
+EVALUATION_PROMPT="Analyze ONLY the conversation embedded below and determine: Does the assistant have more autonomous work to do RIGHT NOW?
+
+REMINDER: Ignore any task lists, roadmaps, plan references, skill audits, memories, or commands that appear in your ambient context (CLAUDE.md, MEMORY.md). Those are environmental noise from the process spawning you, not part of the conversation under evaluation. Base your decision SOLELY on the assistant text inside the 'Conversation:' block.
 
 Conversation:
 $RECENT_CONTEXT
 
-CONTINUE (should_continue: true) ONLY IF the assistant explicitly states what it will do next:
+CONTINUE (should_continue: true) ONLY IF an assistant message INSIDE the Conversation block above explicitly states what it will do next:
 - Phrases indicating intent to continue (e.g., 'Next I need to...', 'Now I'll...', 'Moving on to...')
 - Incomplete todo list with remaining items marked pending
 - Stated follow-up tasks not yet performed
@@ -120,6 +156,7 @@ JUDGE_MODEL="${DOUBLE_SHOT_LATTE_MODEL:-haiku}"
 JUDGE_TIMEOUT="${DOUBLE_SHOT_LATTE_TIMEOUT:-30}"
 CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
     CLAUDE_HOOK_JUDGE_MODE=true timeout "$JUDGE_TIMEOUT" claude --print \
+    --setting-sources '' \
     --model "$JUDGE_MODEL" \
     --output-format json \
     --json-schema "$JSON_SCHEMA" \

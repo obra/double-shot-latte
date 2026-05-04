@@ -66,9 +66,18 @@ fi
 
 # Extract the last few exchanges from the transcript.
 # JSONL files have one JSON object per line; lines from parallel agents can be
-# megabytes each. Take the last 4 lines then cap total size so the judge model
-# gets classification-level context, not a firehose.
-RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
+# megabytes each. Filter out non-message entries (file-history-snapshot,
+# attachment, system) before windowing — these trail the assistant's prose
+# response and cause the judge to anchor on them, producing false-positive
+# "no response yet" continuations. Untyped entries (e.g., test fixtures using
+# {"role":...,"content":...}) pass through unchanged. Then take the last 12
+# message-bearing entries and cap total size so the judge gets
+# classification-level context, not a firehose.
+RECENT_CONTEXT=$(tail -n 100 "$TRANSCRIPT_PATH" \
+    | jq -c 'select(.type != "file-history-snapshot" and .type != "attachment" and .type != "system")' 2>/dev/null \
+    | tail -n 12 \
+    | jq -s '.' 2>/dev/null \
+    | head -c 64000)
 
 # Create a JSON schema for the response
 JSON_SCHEMA='{"type":"object","properties":{"should_continue":{"type":"boolean"},"reasoning":{"type":"string"}},"required":["should_continue","reasoning"]}'

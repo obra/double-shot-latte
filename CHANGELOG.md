@@ -5,6 +5,11 @@ All notable changes to Double Shot Latte will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.1] - 2026-05-18
+
+### Fixed
+- Continuation loop where the judge fixated on stale internal thinking and kept forcing continuation after a summary was delivered. Cause was the context extraction: `tail -n 4` counted records not turns and `head -c 32000` kept the oldest bytes (and could truncate to invalid JSON), so the judge saw stale thinking and never the delivered completion. Extraction is now turn-aware, keeps the newest bytes, filters `isSidechain` parallel-agent output, and tolerates unparseable lines; thinking and tool activity are still included. The judge prompt and throttle are unchanged.
+
 ## [1.2.0] - 2026-02-25
 
 ### Fixed

@@ -64,11 +64,34 @@ if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
     exit 0
 fi
 
-# Extract the last few exchanges from the transcript.
-# JSONL files have one JSON object per line; lines from parallel agents can be
-# megabytes each. Take the last 4 lines then cap total size so the judge model
-# gets classification-level context, not a firehose.
-RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
+# Newest assistant/user turns (incl. thinking + tool_use/tool_result),
+# sidechain-filtered, [T#]-ordered, newest bytes kept.
+RECENT_CONTEXT=$(tail -c 200000 "$TRANSCRIPT_PATH" 2>/dev/null \
+  | jq -R 'fromjson? // empty' 2>/dev/null \
+  | jq -s -r --argjson n 8 '
+      [ .[]
+        | select((.isSidechain // false) == false)
+        | select(.type == "assistant" or .type == "user")
+        | { role: .type,
+            text: ((.message.content // [])
+              | if type == "array" then
+                  [ .[]
+                    | if   .type=="text"        then .text
+                      elif .type=="thinking"    then "(thinking) " + (.thinking // "")
+                      elif .type=="tool_use"    then "(tool_use:" + (.name // "?") + ") " + ((.input // {})|tostring)
+                      elif .type=="tool_result" then "(tool_result) " + ((.content // "")|tostring)
+                      else empty end ] | join("\n")
+                else (.|tostring) end) }
+        | select((.text // "") | length > 0) ]
+      | .[-($n):] | to_entries
+      | map("[T\(.key)] " + (if .value.role=="assistant" then "ASSISTANT: " else "USER: " end) + .value.text)
+      | join("\n\n---\n\n")' 2>/dev/null \
+  | tail -c 24000)
+
+if [ -z "$RECENT_CONTEXT" ]; then
+  echo '{"decision": "approve", "reason": "Could not extract conversation context, allowing default stop behavior"}'
+  exit 0
+fi
 
 # Create a JSON schema for the response
 JSON_SCHEMA='{"type":"object","properties":{"should_continue":{"type":"boolean"},"reasoning":{"type":"string"}},"required":["should_continue","reasoning"]}'

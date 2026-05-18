@@ -83,11 +83,11 @@ git push
 ```bash
 # Test hook script directly
 echo '{"session_id":"test","transcript_path":"/dev/null","stop_hook_active":false}' | \
-  ./scripts/claude-judge-continuation.sh
+  ./hooks/claude-judge-continuation
 
 # Test recursion prevention
 echo '{"session_id":"test"}' | \
-  CLAUDE_HOOK_JUDGE_MODE=true ./scripts/claude-judge-continuation.sh
+  CLAUDE_HOOK_JUDGE_MODE=true ./hooks/claude-judge-continuation
 ```
 
 ## File Checklist
@@ -97,7 +97,7 @@ Before release, verify these files are correct:
 ### Core Plugin Files
 - [ ] `.claude-plugin/plugin.json` - version, description, paths
 - [ ] `hooks/hooks.json` - hook configuration
-- [ ] `scripts/claude-judge-continuation.sh` - executable, correct logic
+- [ ] `hooks/claude-judge-continuation` - executable, correct logic
 - [ ] `README.md` - installation instructions, current features
 - [ ] `LICENSE` - correct license text
 - [ ] `CHANGELOG.md` - updated with new version

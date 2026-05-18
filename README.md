@@ -107,7 +107,7 @@ By default, the plugin uses Claude Haiku for fast, cost-effective judgments. You
 ## Technical Details
 
 - **Default Model:** Claude Haiku (fast, cost-effective)
-- **Context:** Last 10 transcript entries
+- **Context:** Last ~8 conversation turns (newest bytes, sidechain-filtered)
 - **Throttling:** 3 continuations per 5-minute window
 - **Performance:** Minimal latency on stop decisions only
 

@@ -39,7 +39,11 @@ exit /b 0
 CMDBLOCK
 
 # Unix: run the named script via explicit bash (no execute-bit required)
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+if [ -n "$BASH_VERSION" ]; then
+    eval 'SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"'
+else
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+fi
 SCRIPT_NAME="$1"
 shift
 exec bash "${SCRIPT_DIR}/${SCRIPT_NAME}" "$@"

@@ -1,0 +1,102 @@
+{
+  "name": "Live transcript shape: assistant text buried behind tool calls and metadata",
+  "description": "Real Claude Code JSONL: the closing assistant message is followed by tool_use/tool_result and session bookkeeping lines. A raw tail -n 4 misses it entirely - should CONTINUE on the stated next steps",
+  "expected_decision": true,
+  "transcript": [
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": "Create a user auth system with login, logout and registration"
+      },
+      "uuid": "u0",
+      "sessionId": "s"
+    },
+    {
+      "type": "assistant",
+      "isSidechain": false,
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "text",
+            "text": "I'll build all three handlers; starting with login."
+          }
+        ]
+      },
+      "uuid": "u",
+      "sessionId": "s"
+    },
+    {
+      "type": "assistant",
+      "isSidechain": false,
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_x",
+            "name": "Write",
+            "input": {
+              "file_path": "src/auth/login.ts",
+              "content": "export function login(){}"
+            }
+          }
+        ]
+      },
+      "uuid": "u",
+      "sessionId": "s"
+    },
+    {
+      "type": "user",
+      "message": {
+        "role": "user",
+        "content": [
+          {
+            "type": "tool_result",
+            "tool_use_id": "toolu_x",
+            "content": "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+          }
+        ]
+      },
+      "uuid": "u2",
+      "sessionId": "s"
+    },
+    {
+      "type": "assistant",
+      "isSidechain": false,
+      "message": {
+        "role": "assistant",
+        "content": [
+          {
+            "type": "tool_use",
+            "id": "toolu_x",
+            "name": "Write",
+            "input": {
+              "file_path": "src/auth/login.ts",
+              "content": "export function login(){}"
+            }
+          }
+        ]
+      },
+      "uuid": "u",
+      "sessionId": "s"
+    },
+    {
+      "type": "last-prompt",
+      "lastPrompt": "...",
+      "leafUuid": "l",
+      "sessionId": "s"
+    },
+    {
+      "type": "custom-title",
+      "customTitle": "Auth",
+      "sessionId": "s"
+    },
+    {
+      "type": "mode",
+      "mode": "normal",
+      "sessionId": "s"
+    }
+  ]
+}

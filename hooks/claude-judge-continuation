@@ -64,11 +64,83 @@ if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
     exit 0
 fi
 
-# Extract the last few exchanges from the transcript.
-# JSONL files have one JSON object per line; lines from parallel agents can be
-# megabytes each. Take the last 4 lines then cap total size so the judge model
-# gets classification-level context, not a firehose.
-RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
+# The Stop hook can fire before the assistant's closing message has been
+# flushed to the transcript. Verified against a real session: with the closing
+# message present the judge approves the stop; on the same transcript one entry
+# short it blocks. Judging a turn whose conclusion is not yet on disk produces
+# exactly the failure this plugin exists to avoid -- continuing a turn that
+# already answered, sometimes one that ended by asking the user a question.
+#
+# The pre-flush tail is indistinguishable by shape from a finished turn (both
+# end in assistant text), so the only available signal is the file settling.
+# Wait for the size to hold steady across consecutive samples, with a minimum
+# wait so a write arriving shortly after we start is still caught. Bounded and
+# fails open: after the cap, judge whatever is on disk.
+FLUSH_MIN_WAIT="${DOUBLE_SHOT_LATTE_FLUSH_MIN_WAIT:-1.5}"
+FLUSH_MAX_WAIT="${DOUBLE_SHOT_LATTE_FLUSH_MAX_WAIT:-4}"
+flush_interval="0.25"
+flush_elapsed=0
+flush_prev=$(wc -c < "$TRANSCRIPT_PATH" 2>/dev/null || echo 0)
+flush_stable=0
+while :; do
+    sleep "$flush_interval"
+    flush_elapsed=$(awk "BEGIN {print $flush_elapsed + $flush_interval}")
+    flush_size=$(wc -c < "$TRANSCRIPT_PATH" 2>/dev/null || echo 0)
+    if [ "$flush_size" = "$flush_prev" ]; then
+        flush_stable=$((flush_stable + 1))
+    else
+        flush_stable=0
+        flush_prev=$flush_size
+    fi
+    # settled: steady for two samples and past the minimum wait
+    if [ "$flush_stable" -ge 2 ] && [ "$(awk "BEGIN {print ($flush_elapsed >= $FLUSH_MIN_WAIT)}")" = "1" ]; then
+        break
+    fi
+    if [ "$(awk "BEGIN {print ($flush_elapsed >= $FLUSH_MAX_WAIT)}")" = "1" ]; then
+        break
+    fi
+done
+
+# Build the judge's context window.
+#
+# Transcript lines are not messages. A single assistant turn can spend its
+# final lines on thinking blocks, tool_use/tool_result pairs and session
+# bookkeeping (last-prompt, custom-title, mode, bridge-session), so a raw
+# `tail -n 4` frequently excludes the assistant's closing message -- the one
+# thing the classification actually depends on. Observed failures in both
+# directions: continuing after the assistant had asked the user a question,
+# and stopping mid-task, purely because the window held no assistant text.
+#
+# Scan a wider slice of lines, keep only entries carrying user or assistant
+# text, and pass the judge the last few of those. Filtering out tool_result
+# payloads also removes the megabyte-per-line firehose the size cap existed
+# to contain. Both the live transcript shape (.type/.message.content) and
+# the flat {role, content} shape used by test/evals are accepted.
+RECENT_CONTEXT=$(tail -n 80 "$TRANSCRIPT_PATH" 2>/dev/null \
+    | jq -R 'fromjson? // empty' 2>/dev/null \
+    | jq -s '[ .[]
+        | select(.isSidechain != true)
+        | select(.type == "user" or .type == "assistant"
+                 or .role == "user" or .role == "assistant")
+        | { role: (.message.role // .role // .type),
+            text: ((.message.content // .content)
+                   | if type == "string" then .
+                     elif type == "array" then
+                       ([ .[] | select(.type == "text") | .text ] | join("\n"))
+                     else "" end) }
+        | select((.text | length) > 0) ] as $msgs
+      | ($msgs | map(select(.role == "user")) | last) as $last_user
+      | ($msgs[-6:]) as $window
+      | if ($window | any(.role == "user")) or ($last_user == null)
+        then $window
+        else [$last_user] + $window
+        end' 2>/dev/null | head -c 32000)
+
+# If filtering found no message text, fall back to the raw tail rather than
+# judging on nothing.
+if [ -z "$RECENT_CONTEXT" ] || [ "$RECENT_CONTEXT" = "[]" ]; then
+    RECENT_CONTEXT=$(tail -n 4 "$TRANSCRIPT_PATH" | jq -s '.' 2>/dev/null | head -c 32000)
+fi
 
 # Create a JSON schema for the response
 JSON_SCHEMA='{"type":"object","properties":{"should_continue":{"type":"boolean"},"reasoning":{"type":"string"}},"required":["should_continue","reasoning"]}'
@@ -83,8 +155,14 @@ mkdir -p "$CLAUDE_WORK_DIR"
 # Create the evaluation prompt
 EVALUATION_PROMPT="Analyze this conversation and determine: Does the assistant have more autonomous work to do RIGHT NOW?
 
-Conversation:
+Conversation (chronological; the LAST entry is the assistant's final message):
 $RECENT_CONTEXT
+
+Judge the FINAL entry. Earlier entries are background only -- whatever they
+announced has already happened, because the assistant went on to produce the
+final entry. In particular, a preamble that introduces work ('Let me check X',
+'Now I'll run Y', 'Checking Z') is NOT pending work when a later entry reports
+results or answers the question; that work is done.
 
 CONTINUE (should_continue: true) ONLY IF the assistant explicitly states what it will do next:
 - Phrases indicating intent to continue (e.g., 'Next I need to...', 'Now I'll...', 'Moving on to...')
@@ -116,6 +194,13 @@ Default to STOP when uncertain."
 # Run claude in the dedicated working directory
 # Model can be configured via DOUBLE_SHOT_LATTE_MODEL env var (default: haiku)
 # Timeout can be configured via DOUBLE_SHOT_LATTE_TIMEOUT env var (default: 30s)
+# Tool denylist for the judge subprocess.
+# NOTE: '*' cannot be used here -- it also denies the internal StructuredOutput tool
+# that --json-schema depends on, which makes every judgement fail. Deny takes
+# precedence over --allowedTools, and an empty --allowedTools enforces nothing, so an
+# explicit denylist is the only working way to strip the judge down to StructuredOutput.
+# --strict-mcp-config additionally prevents any MCP server from being loaded.
+JUDGE_DENIED_TOOLS='Bash BashOutput KillShell Edit MultiEdit Write Read NotebookRead NotebookEdit Glob Grep LS Task Agent ListAgents SendMessage TaskOutput TaskStop Workflow Skill SlashCommand ToolSearch WebFetch WebSearch TodoWrite Artifact SendUserFile AskUserQuestion EnterPlanMode ExitPlanMode EnterWorktree ExitWorktree Monitor ScheduleWakeup CronCreate CronDelete CronList PushNotification RemoteTrigger DesignSync ReportFindings EndConversation ListMcpResourcesTool ReadMcpResourceTool ReadMcpResourceDirTool mcp__*'
 JUDGE_MODEL="${DOUBLE_SHOT_LATTE_MODEL:-haiku}"
 JUDGE_TIMEOUT="${DOUBLE_SHOT_LATTE_TIMEOUT:-30}"
 CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
@@ -124,7 +209,8 @@ CLAUDE_RESPONSE=$(cd "$CLAUDE_WORK_DIR" && echo "$EVALUATION_PROMPT" | \
     --output-format json \
     --json-schema "$JSON_SCHEMA" \
     --system-prompt "$SYSTEM_PROMPT" \
-    --disallowedTools '*' 2>/dev/null)
+    --disallowedTools "$JUDGE_DENIED_TOOLS" \
+    --strict-mcp-config 2>/dev/null)
 CLAUDE_EXIT_CODE=$?
 
 # Check if claude command succeeded (exit 124 = timeout)

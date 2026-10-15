@@ -123,6 +123,21 @@ By default, the plugin uses Claude Haiku for fast, cost-effective judgments. You
 - Check throttle files: `/tmp/.claude-continue-throttle-*`
 - Verify `jq` is installed
 
+## Testing
+
+Run the deterministic Stop-hook output regression tests without calling Claude:
+
+```bash
+python3 test/test-stop-output.py
+```
+
+The tests require Python 3, Bash and `jq`. They isolate the home directory and
+stub Claude and `timeout`, covering normal stops, fallbacks, throttling and
+continuation. Allowed stops emit `{}`; continuation emits `decision: "block"`
+with a reason. The unsupported Stop decision `"approve"` causes Codex to report
+`hook returned invalid stop hook JSON output`. Diagnostic stop reasons go to
+stderr instead of the decision JSON.
+
 ## Contributing
 
 1. Fork repository

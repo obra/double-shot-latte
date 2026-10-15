@@ -14,9 +14,15 @@ cleanup() {
 }
 trap cleanup EXIT TERM INT HUP
 
+# Stop hooks allow stopping by omitting decision; "approve" is not a valid Stop decision.
+allow_stop() {
+    printf '%s\n' "$1" >&2
+    echo '{}'
+}
+
 # Check if we're in a recursive call (judge Claude instance)
 if [ "$CLAUDE_HOOK_JUDGE_MODE" = "true" ]; then
-    echo '{"decision": "approve", "reason": "Running in judge mode, allowing stop"}'
+    allow_stop "Running in judge mode, allowing stop"
     exit 0
 fi
 
@@ -52,7 +58,7 @@ if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
 
     # If we've continued too many times recently, force stop
     if [ "$CONTINUE_COUNT" -ge 3 ] && [ "$TIME_SINCE_LAST" -lt 300 ]; then
-        echo '{"decision": "approve", "reason": "Maximum continuation cycles reached in time window, forcing stop to prevent infinite loops"}'
+        allow_stop "Maximum continuation cycles reached in time window, forcing stop to prevent infinite loops"
         rm -f "$THROTTLE_FILE"
         exit 0
     fi
@@ -60,7 +66,7 @@ fi
 
 # Check if we have a transcript path
 if [ -z "$TRANSCRIPT_PATH" ] || [ ! -f "$TRANSCRIPT_PATH" ]; then
-    echo '{"decision": "approve", "reason": "No transcript available for evaluation"}'
+    allow_stop "No transcript available for evaluation"
     exit 0
 fi
 
@@ -130,9 +136,9 @@ CLAUDE_EXIT_CODE=$?
 # Check if claude command succeeded (exit 124 = timeout)
 if [ $CLAUDE_EXIT_CODE -ne 0 ]; then
     if [ $CLAUDE_EXIT_CODE -eq 124 ]; then
-        echo '{"decision": "approve", "reason": "Claude evaluation timed out, allowing default stop behavior"}'
+        allow_stop "Claude evaluation timed out, allowing default stop behavior"
     else
-        echo '{"decision": "approve", "reason": "Claude evaluation command failed, allowing default stop behavior"}'
+        allow_stop "Claude evaluation command failed, allowing default stop behavior"
     fi
     exit 0
 fi
@@ -142,7 +148,7 @@ EVALUATION_RESULT=$(echo "$CLAUDE_RESPONSE" | jq '.structured_output // empty' 2
 
 # If no structured output, fall back to allowing stop
 if [ -z "$EVALUATION_RESULT" ] || [ "$EVALUATION_RESULT" = "null" ]; then
-    echo '{"decision": "approve", "reason": "Could not parse Claude evaluation result, allowing default stop behavior"}'
+    allow_stop "Could not parse Claude evaluation result, allowing default stop behavior"
     exit 0
 fi
 
@@ -172,10 +178,7 @@ else
     rm -f "$THROTTLE_FILE"
 
     # Allow the stop - Claude thinks stopping is appropriate
-    jq -n --arg reason "Claude evaluator determined stopping is appropriate: $REASONING" '{
-        "decision": "approve",
-        "reason": $reason
-    }'
+    allow_stop "Claude evaluator determined stopping is appropriate: $REASONING"
 fi
 
 exit 0
